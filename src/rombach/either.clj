@@ -90,7 +90,7 @@
           [[] []] e-a-bs))
 
 ;;;; Typeclass implementations
-(def either-functor
+(def functor
   (functor/functor
    (fn [f e]
      (cond
@@ -98,7 +98,11 @@
        (right? e) (right (f (right-a e)))
        :else (c/assertion-violation `either-applicative "not a value of type either" e)))))
 
-(def either-applicative
+(defn fmap
+  [f e]
+  ((functor/functor-fmap either-functor) f e))
+
+(def applicative
   (applicative/applicative
    either-functor
    right
@@ -108,3 +112,11 @@
        (right? ea)
        ((functor/functor-fmap either-functor) (right-a ea) eb)
        :else (c/assertion-violation `either-applicative "not a value of type either" ea eb)))))
+
+(defn pure
+  [x] 
+  ((applicative/applicative-pure either-applicative) x))
+
+(defn apply
+  [f e]
+  ((applicative/applicative-apply either-applicative) f e))

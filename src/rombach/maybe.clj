@@ -112,7 +112,7 @@
        (map just-a)))
 
 ;;;; Typeclass implementations
-(def maybe-functor
+(def functor
   "Functor instance for values of type maybe."
   (functor/functor
    (fn [f m]
@@ -121,10 +121,10 @@
        (nothing? m) m
        :else        (fail-maybe `maybe-functor m)))))
 
-(def maybe-applicative
+(def applicative
   "Applicative instance for values of type maybe."
   (applicative/applicative
-   maybe-functor
+   functor
    just
    (fn [f m]
      (cond
@@ -132,7 +132,7 @@
        (just? f)    ((functor/functor-fmap maybe-functor) (just-a f) m)
        :else        (fail-maybe `maybe-applicative m)))))
 
-(defn maybe-monoid-of
+(defn monoid-of
   [inner-monoid]
   (monoid/monoid
    nothing
@@ -144,32 +144,12 @@
        (just (monoid/monoid-mappend inner-monoid (just-a ma) (just-a mb)))
        :else         (fail-maybe `maybe-monoid-of ma mb)))))
 
-(def maybe-monad
+(def monad
   (monad/monad
-   maybe-functor
+   applicative
    just
    (fn [fa fb]
      (cond
        (nothing? fa) fa
        (just? fa)    (fb (just-a fa))
        :else         (fail-maybe `maybe-monad fa fb)))))
-
-(define-record-type MaybeT
-  (maybe-t monad run) maybe-t?
-  [monad maybe-t-monad
-   run maybe-t-run])
-
-(defn maybe-monad-transformer
-  [wrap-monad]
-  (monad/monad
-   maybe-functor
-   (fn [x] (maybe-t ((monad/monad-return wrap-monad) (just x))))
-   (fn [x f]
-     (maybe-t
-      ((monad/monad-bind
-        (maybe-t-run x)
-        (fn [maybe-value]
-          (cond
-            (nothing? maybe-value) ((monad/monad-return wrap-monad) nothing)
-            (just? maybe-value) (let [value (just-a maybe-value)]
-                                  (f value))))))))))

@@ -74,15 +74,29 @@
   (functor/functor
    (fn [f xs]
      (when-not (list? xs)
-       (c/assertion-violation `list-functor "not a list" xs))
+       (c/assertion-violation `list-functor "not a value of type list" xs))
      (map f xs))))
 
 (def vec-functor
   (functor/functor
    (fn [f xs]
      (when-not (vector? xs)
-       (c/assertion-violation `vec-functor "not a vector" xs))
+       (c/assertion-violation `vec-functor "not a value of type vector" xs))
      (mapv f xs))))
+
+(def set-functor
+  (functor/functor
+   (fn [f xs]
+     (when-not (set? xs)
+       (c/assertion-violation `set-functor "not a value of type set" xs))
+     (set (map f xs)))))
+
+(def map-functor
+  (functor/functor
+   (fn [f kvs]
+     (when-not (map? kvs)
+       (c/assertion-violation `map-functor "not a value of type map" kvs))
+     (into {} (map (fn [[k v]] [k (f v)]) kvs)))))
 
 (def fn-functor
   (functor/functor (fn [f g]
