@@ -1,40 +1,15 @@
 (ns rombach.either
-  (:require [active.clojure.record :refer [define-record-type]]
+  (:require [active.clojure.condition :as c]
             [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as sgen]
-            [rombach.functor :as functor]
-            [rombach.monoid :as monoid]
             [rombach.applicative :as applicative]
-            [active.clojure.condition :as c]))
+            [rombach.functor :as functor]
+            [rombach.product :refer [defproduct]]))
 
-(define-record-type Left
-  (left a) left?
-  [a left-a])
+(defproduct left left left?
+  [[a any?]])
 
-(s/def ::a any?)
-(s/def ::left (let [keys (s/keys :req-un [::a])]
-                (s/with-gen (s/and keys left?)
-                  #(sgen/fmap map->Left (s/gen keys)))))
-(s/fdef left
-  :args (s/cat :a ::a)
-  :ret ::left)
-(s/fdef left-a
-  :args (s/cat :Left ::left)
-  :ret ::a)
-
-(define-record-type Right
-  (right a) right?
-  [a right-a])
-(s/def ::a any?)
-(s/def ::right (let [keys (s/keys :req-un [::a])]
-                (s/with-gen (s/and keys left?)
-                  #(sgen/fmap map->Right (s/gen keys)))))
-(s/fdef right
-  :args (s/cat :a ::a)
-  :ret ::right)
-(s/fdef left-a
-  :args (s/cat :Right ::right)
-  :ret ::a)
+(defproduct right right right?
+  [[b any?]])
 
 (defn either?
   [obj]
@@ -54,7 +29,7 @@
   [a->c b->c e-a-b]
   (cond
     (left? e-a-b) (b->c (left-a e-a-b))
-    (right? e-a-b) (a->c (right-a e-a-b))
+    (right? e-a-b) (a->c (right-b e-a-b))
     :else (fail-either `either e-a-b)))
 
 (defn lefts
@@ -75,7 +50,7 @@
        (filter right?)
        (map (fn [e-a]
               (when-not (right? e-a) (fail-either `rights e-a))
-              (right-a e-a)))))
+              (right-b e-a)))))
 
 (defn partition-eithers
   "Partitions a list of Either into two lists.
@@ -85,7 +60,7 @@
   (reduce (fn [[lefts rights] e-a-b]
             (cond
               (left? e-a-b) [(conj lefts (left-a e-a-b)) rights]
-              (right? e-a-b) [lefts (conj rights (right-a e-a-b))]
+              (right? e-a-b) [lefts (conj rights (right-b e-a-b))]
               :else (fail-either `partition-eithers e-a-b)))
           [[] []] e-a-bs))
 
@@ -95,28 +70,28 @@
    (fn [f e]
      (cond
        (left? e)  e
-       (right? e) (right (f (right-a e)))
+       (right? e) (right (f (right-b e)))
        :else (c/assertion-violation `either-applicative "not a value of type either" e)))))
 
 (defn fmap
   [f e]
-  ((functor/functor-fmap either-functor) f e))
+  ((functor/functor-fmap functor) f e))
 
 (def applicative
   (applicative/applicative
-   either-functor
+   functor
    right
    (fn [ea eb]
      (cond
        (left? ea) ea
        (right? ea)
-       ((functor/functor-fmap either-functor) (right-a ea) eb)
+       ((functor/functor-fmap functor) (right-b ea) eb)
        :else (c/assertion-violation `either-applicative "not a value of type either" ea eb)))))
 
 (defn pure
-  [x] 
-  ((applicative/applicative-pure either-applicative) x))
+  [x]
+  ((applicative/applicative-pure applicative) x))
 
 (defn apply
   [f e]
-  ((applicative/applicative-apply either-applicative) f e))
+  ((applicative/applicative-apply applicative) f e))

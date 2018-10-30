@@ -1,9 +1,9 @@
 (ns rombach.core
-  (:require [rombach.functor :as functor]
+  (:require [active.clojure.condition :as c]
             [rombach.applicative :as applicative]
-            [active.clojure.condition :as c]
-            [rombach.monoid :as monoid]
-            [rombach.monad :as monad]))
+            [rombach.functor :as functor]
+            [rombach.monad :as monad]
+            [rombach.monoid :as monoid]))
 
 (defn _fmap
   [functor a->b fa]

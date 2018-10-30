@@ -1,39 +1,20 @@
 (ns rombach.maybe
   (:require [active.clojure.condition :as c]
-            [active.clojure.record :refer [define-record-type]]
-            [rombach.applicative :as applicative]
-            [rombach.monad :as monad]
-            [rombach.monad-transformer :as monad-transformer]
-            [rombach.functor :as functor]
-            [rombach.monoid :as monoid]
             [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as sgen]))
+            [rombach.applicative :as applicative]
+            [rombach.either :as either]
+            [rombach.functor :as functor]
+            [rombach.monad :as monad]
+            [rombach.monoid :as monoid]
+            [rombach.prism :as prism]
+            [rombach.product :refer [defproduct]]))
 
 ;;;; Maybe
-(define-record-type Just
-  (just a) just?
-  [a just-a])
+(defproduct just just just?
+  [[a any?]])
 
-(s/def ::a any?)
-(s/def ::just (let [keys (s/keys :req-un [::a])]
-                (s/with-gen (s/and keys just?)
-                  #(sgen/fmap map->Just (s/gen keys)))))
-(s/fdef just
-  :args (s/cat :a ::a)
-  :ret ::just)
-(s/fdef just-a
-  :args (s/cat :Just ::just)
-  :ret ::a)
-
-(define-record-type Nothing
-  (make-nothing) nothing?
+(defproduct nothing make-nothing nothing?
   [])
-
-(s/def ::nothing (s/with-gen nothing?
-                   #(sgen/return (make-nothing))))
-(s/fdef nothing
-  :args (s/cat)
-  :ret ::nothing)
 
 (def nothing (make-nothing))
 
@@ -43,6 +24,21 @@
 
 (s/def ::maybe (s/or :just ::just
                      :nothing ::nothing))
+
+;;;; Prism over maybe.
+(def the-just
+  (prism/prism (fn [m]
+                 (cond
+                   (just? m)    (either/right (just-a m))
+                   (nothing? m) (either/left nothing)))
+               just))
+
+(def the-nothing
+  (prism/prism (fn [m]
+                 (cond
+                   (just? m)    (either/left m)
+                   (nothing? m) (either/right nothing)))
+               (constantly nothing)))
 
 ;;;; Utility functions.
 
@@ -119,7 +115,7 @@
      (cond
        (just? m)    (just (f (just-a m)))
        (nothing? m) m
-       :else        (fail-maybe `maybe-functor m)))))
+       :else        (fail-maybe `functor m)))))
 
 (def applicative
   "Applicative instance for values of type maybe."
@@ -129,8 +125,8 @@
    (fn [f m]
      (cond
        (nothing? f) f
-       (just? f)    ((functor/functor-fmap maybe-functor) (just-a f) m)
-       :else        (fail-maybe `maybe-applicative m)))))
+       (just? f)    ((functor/functor-fmap functor) (just-a f) m)
+       :else        (fail-maybe `applicative m)))))
 
 (defn monoid-of
   [inner-monoid]

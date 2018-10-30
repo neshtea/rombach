@@ -1,13 +1,14 @@
 (ns rombach.monad
-  (:require [active.clojure.record :refer [define-record-type]]))
+  (:require [clojure.spec.alpha :as s]
+            [rombach.applicative :as applicative]
+            [rombach.product :refer [defproduct]]))
 
-(define-record-type Monad
-  (make-monad applicative return bind seq fail) monad?
-  [applicative monad-applicative
-   return monad-return
-   bind monad-bind
-   seq monad-seq
-   fail monad-fail])
+(defproduct monad make-monad monad?
+  [[applicative ::applicative/applicative]
+   [return fn?]
+   [bind fn?]
+   [seq (s/or :none nil? :function fn?)]
+   [fail (s/or :none nil? :function fn?)]])
 
 (defn monad
   ([applicative return bind]
