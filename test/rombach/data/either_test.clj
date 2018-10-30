@@ -1,7 +1,7 @@
 (ns rombach.data.either-test
-  (:require [rombach.data.either :as either]
+  (:require [clojure.spec.test.alpha :as stest]
             [clojure.test :refer :all]
-            [clojure.spec.test.alpha :as stest]))
+            [rombach.data.either :as either]))
 
 (stest/instrument)
 

@@ -101,8 +101,7 @@
   [a->m-b as]
   (->> as
        (map a->m-b)
-       (filter just?)
-       (map just-a)))
+       (filter just?)))
 
 ;;;; Typeclass implementations
 (def functor
