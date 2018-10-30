@@ -3,15 +3,15 @@
             [clojure.spec.alpha :as s]))
 
 (defmacro defsum
-  [?sum-name ?predicate-name ?predicates]
+  [?sum-name ?predicate-name ?predicate-pairs]
   `(do
-     (def ~?sum-name {:predicates ~?predicates})
+     (def ~?sum-name {:predicates ~(map first ?predicate-pairs)})
      ;; Predicate
      (s/def ~(keyword (str *ns*) (str ?sum-name))
        (s/or ~@(apply concat
-                      (map (fn [pred-sym]
-                             [(keyword pred-sym) pred-sym])
-                           ?predicates))))
+                      (map (fn [[pred-sym pred-spec]]
+                             [(keyword pred-sym) pred-spec])
+                           ?predicate-pairs))))
      (defn ~?predicate-name [obj#]
        (s/valid? ~(keyword (str *ns*) (str ?sum-name)) obj#))))
 
@@ -52,19 +52,3 @@
             (throw (ex-info "incomplete match" {:missing-clauses missing}))))
        (cond
          ~@?cond-clauses))))
-
-(defproduct red red red? [])
-(defproduct green green green? [])
-(defproduct blue blue blue? [])
-
-(defsum color color?
-  [red? green? blue?])
-
-(defn match-color
-  [x]
-  (match color x
-         red? "foo"
-         green? "bar"
-         blue? "bsz"))
-
-(match-color 42)

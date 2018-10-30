@@ -7,7 +7,8 @@
             [rombach.data.either :as either]
             [rombach.data.functor :as functor]
             [rombach.data.monoid :as monoid]
-            [rombach.structure.product :refer [defproduct]]))
+            [rombach.structure.product :refer [defproduct]]
+            [rombach.structure.sum :refer [defsum]]))
 
 ;;;; Maybe
 (defproduct just just just?
@@ -18,12 +19,8 @@
 
 (def nothing (make-nothing))
 
-(defn maybe?
-  [obj]
-  (or (just? obj) (nothing? obj)))
-
-(s/def ::maybe (s/or :just ::just
-                     :nothing ::nothing))
+(defsum maybe maybe? [[just? ::just]
+                      [nothing? ::nothing]])
 
 ;;;; Prism over maybe.
 (def the-just

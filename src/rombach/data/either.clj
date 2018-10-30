@@ -1,9 +1,9 @@
 (ns rombach.data.either
   (:require [active.clojure.condition :as c]
-            [clojure.spec.alpha :as s]
             [rombach.control.applicative :as applicative]
             [rombach.data.functor :as functor]
-            [rombach.structure.product :refer [defproduct]]))
+            [rombach.structure.product :refer [defproduct]]
+            [rombach.structure.sum :refer [defsum]]))
 
 (defproduct left left left?
   [[a any?]])
@@ -11,12 +11,8 @@
 (defproduct right right right?
   [[b any?]])
 
-(defn either?
-  [obj]
-  (or (left? obj) (right? obj)))
-
-(s/def ::either (s/or :left ::left
-                      :right ::right))
+(defsum either either? [[left? ::left]
+                        [right? ::right]])
 
 ;;;; Utility functions.
 (defn- fail-either
@@ -28,9 +24,9 @@
   function to a; if it is Right b, apply the second function to b."
   [a->c b->c e-a-b]
   (cond
-    (left? e-a-b) (b->c (left-a e-a-b))
+    (left? e-a-b)  (b->c (left-a e-a-b))
     (right? e-a-b) (a->c (right-b e-a-b))
-    :else (fail-either `either e-a-b)))
+    :else          (fail-either `either e-a-b)))
 
 (defn lefts
   "Extracts from a list of Either all the Left elements.
