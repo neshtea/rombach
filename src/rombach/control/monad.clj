@@ -1,8 +1,8 @@
 (ns rombach.control.monad
   (:require [clojure.spec.alpha :as s]
             [rombach.control.applicative :as applicative]
-            [rombach.structure.product :refer [defproduct]]
-            [rombach.data.functor :as functor]))
+            [rombach.data.functor :as functor]
+            [rombach.structure.product :refer [defproduct]]))
 
 (defproduct monad make-monad monad?
   [[applicative ::applicative/applicative]

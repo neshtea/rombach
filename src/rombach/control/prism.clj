@@ -1,4 +1,4 @@
-(ns rombach.prism
+(ns rombach.control.prism
   (:require [rombach.structure.product :refer [defproduct]]))
 
 (defproduct prism prism prism?

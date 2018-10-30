@@ -2,12 +2,12 @@
   (:require [active.clojure.condition :as c]
             [clojure.spec.alpha :as s]
             [rombach.control.applicative :as applicative]
+            [rombach.control.monad :as monad]
+            [rombach.control.prism :as prism]
             [rombach.data.either :as either]
             [rombach.data.functor :as functor]
-            [rombach.control.monad :as monad]
             [rombach.data.monoid :as monoid]
-            [rombach.control.prism :as prism]
-            [rombach.strcture.product :refer [defproduct]]))
+            [rombach.structure.product :refer [defproduct]]))
 
 ;;;; Maybe
 (defproduct just just just?
