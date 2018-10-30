@@ -1,6 +1,7 @@
-(ns rombach.product
+(ns rombach.structure.product
   (:require [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as sgen]))
+            [clojure.spec.gen.alpha :as sgen]
+            [rombach.control.lens :as lens]))
 
 (defmacro defproduct
   [?struct-name ?constructor-name ?predicate-name ?fields]
@@ -50,7 +51,7 @@
                              (s/explain-str ~(keyword (str *ns*) (str ?struct-name)) ~(quote ?struct-name))})))
                 (get ~(quote ?struct-name) ~(keyword (str *ns*) (str ?struct-name "-" field-name))))
               (def ~(symbol (str ?struct-name "-" field-name "-lens"))
-                (rombach.lens/lens (fn [obj#]
+                (lens/lens (fn [obj#]
                              (~(symbol (str ?struct-name "-" field-name)) obj#))
                            (fn [obj# data#]
                              (assoc obj# ~(keyword (str *ns*) (str ?struct-name "-" field-name)) data#))

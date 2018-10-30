@@ -1,13 +1,13 @@
-(ns rombach.maybe
+(ns rombach.data.maybe
   (:require [active.clojure.condition :as c]
             [clojure.spec.alpha :as s]
-            [rombach.applicative :as applicative]
-            [rombach.either :as either]
-            [rombach.functor :as functor]
-            [rombach.monad :as monad]
-            [rombach.monoid :as monoid]
-            [rombach.prism :as prism]
-            [rombach.product :refer [defproduct]]))
+            [rombach.control.applicative :as applicative]
+            [rombach.data.either :as either]
+            [rombach.data.functor :as functor]
+            [rombach.control.monad :as monad]
+            [rombach.data.monoid :as monoid]
+            [rombach.control.prism :as prism]
+            [rombach.strcture.product :refer [defproduct]]))
 
 ;;;; Maybe
 (defproduct just just just?

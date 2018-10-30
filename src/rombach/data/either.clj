@@ -1,9 +1,9 @@
-(ns rombach.either
+(ns rombach.data.either
   (:require [active.clojure.condition :as c]
             [clojure.spec.alpha :as s]
-            [rombach.applicative :as applicative]
-            [rombach.functor :as functor]
-            [rombach.product :refer [defproduct]]))
+            [rombach.control.applicative :as applicative]
+            [rombach.data.functor :as functor]
+            [rombach.structure.product :refer [defproduct]]))
 
 (defproduct left left left?
   [[a any?]])
