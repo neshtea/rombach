@@ -1,12 +1,40 @@
 # rombach
 
-A Clojure library that implements some of the well known data-structures from Haskell (e.g. Maybe, Either, Functor, Applicative, Monad, Monoid, more to come?).
+A magic-free, side-effect-free, atom-free Clojure library that implements some of the well known data-structures from Haskell (e.g. Maybe, Either, Functor, Applicative, Monad, Monoid, more to come?).
 
 It ships with several implementations of functor, applicative and monad for lists, vectors, maybe, either, ...
 
 ## Usage
 
-Most of the relevant functions are defined in `rombach.core`.
+### Conventions
+
+To use the functionality provided here, it is useful to know a little bit about 
+it's conventions (which of course are still in flux).
+For most of the data-structures, this project's structure mimics that of the
+equivalent Haskell packages they implement (e.g. `data.Maybe` in Haskell is found
+in `rombach.data.monoid`, etc.).
+
+Each namespace implements exactly one structure and defines implementations for
+primitive Clojure strctures when applicable.
+For example, `rombach.data.monoid` defines:
+
+1. The typeclass `monoid`.
+2. The typeclass functions, that is `_mempty` and `_mappend`.
+3. Implementations of `monoid` for `list`s and `vector`s.
+
+The name of the implementations that are defined within the namespace of i.e. 
+`rombach.data.monoid` have the type name (i.e. `list`), prefixed by an underscore.
+
+A namespace should always be required with a qualifier, that is
+`(:require [rombach.data.monoid :as monoid])`.
+This allows for descriptive names in each namespace that match everywhere.
+For example the functor implementation for lists (`rombach.data.functor/_list`)
+has the same name as it's applicative implementation (`rombach.control.applicative/_list`).
+
+I think this makes the intent clear and allows for nicer code..
+
+As every implementation of any typeclass is just data, you are always free the
+bind it to another name (there is absolutely no magic here, just data and functions).
 
 ### Semi-Group
 
@@ -47,7 +75,7 @@ Values that implement monoid are semi-groups that have a zero element.
 A data-type that implements monoid implements a function `_mappend :: a -> a -> a`.
 To define a monoid, you first have to define a semi-group.
 Afterwards, if you notice that your semi-group has a zero element, you can define
-the monoid in terms of the semi-group plus the zero (that element is called the `_mempty_`).
+the monoid in terms of the semi-group plus the zero (that element is called the `_mempty`).
 
 Examples:
 
@@ -71,10 +99,10 @@ you could do the following (using `[]` as the zero element).
 (def vector-monoid
   (mon/monoid vector-semi-group []))
 
-(mon/_mempty vector-monoid)
-(mon/_mappend vector-monoid [1 2 3] [4 5])
-(mon/_mappend vector-monoid [] [4 5])
-(mon/_mappend vector-monoid [1 2 3] [])
+(mon/_mempty vector-monoid)  ;; => []
+(mon/_mappend vector-monoid [1 2 3] [4 5])  ;; => [1 2 3 4 5]
+(mon/_mappend vector-monoid [] [4 5])  ;; => [4 5]
+(mon/_mappend vector-monoid [1 2 3] [])  ;; => [1 2 3]
 ```
 
 You need to do your type-checking yourself.
