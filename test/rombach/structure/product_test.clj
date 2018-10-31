@@ -1,9 +1,9 @@
-(ns rombach.product-test
-  (:require [rombach.product :refer [defproduct]]
-            [rombach.lens :as lens]
-            [clojure.spec.alpha :as s]
+(ns rombach.structure.product-test
+  (:require [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as stest]
-            [clojure.test :refer :all]))
+            [clojure.test :refer :all]
+            [rombach.structure.product :refer [defproduct]]
+            [rombach.control.lens :as lens]))
 
 (s/def ::name (s/and string? #(< 0 (count %))))
 (s/def ::age pos-int?)

@@ -1,5 +1,5 @@
 (ns rombach.data.monoid
-  (:require [rombach.data.product :refer [defproduct]]
+  (:require [rombach.structure.product :refer [defproduct]]
             [rombach.data.semi-group :as semi-group]))
 
 (defproduct monoid monoid monoid?
@@ -18,9 +18,7 @@
   ((semi-group/_cat (monoid-semi-group monoid) a b)))
 
 ;;;; Instances
-(def list-monoid
-  (monoid semi-group/list '()))
+(def _list (monoid semi-group/_list '()))
 
-(def vec-monoid
-  (monoid semi-group/vec []))
+(def _vec (monoid semi-group/_vec []))
 

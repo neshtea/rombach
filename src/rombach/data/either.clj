@@ -69,10 +69,6 @@
        (right? e) (right (f (right-b e)))
        :else (c/assertion-violation `either-applicative "not a value of type either" e)))))
 
-(defn fmap
-  [f e]
-  ((functor/functor-fmap functor) f e))
-
 (def applicative
   (applicative/applicative
    functor
@@ -83,11 +79,3 @@
        (right? ea)
        ((functor/functor-fmap functor) (right-b ea) eb)
        :else (c/assertion-violation `either-applicative "not a value of type either" ea eb)))))
-
-(defn pure
-  [x]
-  ((applicative/applicative-pure applicative) x))
-
-(defn apply
-  [f e]
-  ((applicative/applicative-apply applicative) f e))

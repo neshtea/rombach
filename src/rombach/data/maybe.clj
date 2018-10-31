@@ -133,7 +133,7 @@
        (nothing? ma) mb
        (nothing? mb) ma
        (and (just? ma) (just? mb))
-       (just (monoid/monoid-mappend inner-monoid (just-a ma) (just-a mb)))
+       (just (monoid/_mappend inner-monoid (just-a ma) (just-a mb)))
        :else         (fail-maybe `maybe-monoid-of ma mb)))))
 
 (def monad

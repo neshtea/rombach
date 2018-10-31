@@ -23,27 +23,27 @@
   ((applicative-apply applicative) f x))
 
 ;; Instances
-(def list
+(def _list
   (applicative
-   functor/list
+   functor/_list
    list
    (fn [fs xs]
      (for [f fs
            x xs]
        (f x)))))
 
-(def vec
+(def _vec
   (applicative
-   functor/vec
+   functor/_vec
    list
    (fn [fs xs]
      (into [] (for [f fs
                     x xs]
                 (f x))))))
 
-(def function
+(def _function
   (applicative
-   functor/function
+   functor/_function
    (fn [x] (fn [_] x))
    (fn [f g]
      (fn [x]

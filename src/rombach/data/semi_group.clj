@@ -1,5 +1,5 @@
 (ns rombach.data.semi-group
-  (:require [rombach.data.product :refer [defproduct]]))
+  (:require [rombach.structure.product :refer [defproduct]]))
 
 (defproduct semi-group semi-group semi-group?
   [[cat fn?]])
@@ -9,8 +9,8 @@
   ((semi-group-cat semi-group) a b))
 
 ;;;; Instances
-(def list
-  (semi-group (fn [xs ys] (concat xs ys))))
+(def _list (semi-group (fn [xs ys] (concat xs ys))))
 
-(def vec
-  (semi-group (fn [xs ys] (into [] (concat xs ys)))))
+(def _vec (semi-group (fn [xs ys] (into [] (concat xs ys)))))
+
+(def _set (semi-group (fn [xs ys] (clojure.set/union xs ys))))

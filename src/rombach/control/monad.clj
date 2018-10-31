@@ -87,9 +87,12 @@
   `(monadic-1 ~?monad ~(meta &form) ~@?stmts))
 
 ;;;; Instances
-(def list-monad
-  (monad applicative/list
-         list
-         (fn [xs f]
-           (apply concat (functor/_fmap (applicative/applicative-functor applicative/list) f xs)))
-         {:fail (constantly [])}))
+(def _list
+  (monad
+   applicative/_list
+   list
+   (fn [xs f]
+     (apply concat
+            (functor/_fmap
+             (applicative/applicative-functor applicative/_list) f xs)))
+   {:fail (constantly [])}))
