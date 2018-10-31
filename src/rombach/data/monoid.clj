@@ -15,7 +15,7 @@
 
 (defn _mappend
   [monoid a b]
-  ((semi-group/_cat (monoid-semi-group monoid) a b)))
+  (semi-group/_cat (monoid-semi-group monoid) a b))
 
 ;;;; Instances
 (def _list (monoid semi-group/_list '()))
