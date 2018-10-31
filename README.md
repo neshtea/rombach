@@ -36,6 +36,13 @@ I think this makes the intent clear and allows for nicer code..
 As every implementation of any typeclass is just data, you are always free the
 bind it to another name (there is absolutely no magic here, just data and functions).
 
+For types that are not built in the Clojure language (at this point `rombach`
+provides `rombach.data.either` and `rombach.data.maybe`), the convention is that
+typeclass implementations are done in the same namespace as the data structure
+and have the same name as the typeclass they are implementing.
+This means that, for example, the functor instance for maybe is found at
+`rombach.data.maybe/functor`, same for applicative (`rombach.data.maybe/applicative`).
+
 ### Semi-Group
 
 Values that implement semi-group can be concatenated.
