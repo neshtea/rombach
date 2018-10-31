@@ -137,3 +137,13 @@
                                 person-age-lens)
                        phone-book
                        inc)))))
+
+(deftest validate!-test
+  (let [marco (make-person "Marco" "Schneider" 29)]
+    (is (validate-person! marco))
+    (is (thrown? clojure.lang.ExceptionInfo
+                 (validate-person! (assoc (make-person "Marco" "Schneider" 29)
+                                          ::person-age
+                                          -1))))
+    (is (thrown? clojure.lang.ExceptionInfo
+                 (validate-person! 42)))))

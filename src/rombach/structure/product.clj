@@ -28,6 +28,7 @@
      ;; Functions
      ;; Constructor.
      (defn ~?constructor-name
+       ~(format "Returns a new %s." ?struct-name)
        [~@(map first ?fields)]
        (merge {:_struct (quote ~?struct-name)}
               ~(into {} (map (fn [k]
@@ -42,6 +43,7 @@
          (let [[field-name _] field]
            `(do
               (defn ~(symbol (str ?struct-name "-" field-name))
+                ~(format "Takes a %s and returns the %s." ?struct-name field-name)
                 [~(quote ?struct-name)]
                 (when-not (s/valid? ~(keyword (str *ns*) (str ?struct-name)) ~(quote ?struct-name))
                   (throw
@@ -63,5 +65,13 @@
 
      ;; Predicate
      (defn ~?predicate-name
+       ~(format "Takes an object and returns true iff it is a %s." ?struct-name)
        [obj#]
-       (s/valid? ~(keyword (str *ns*) (str ?struct-name)) obj#))))
+       (s/valid? ~(keyword (str *ns*) (str ?struct-name)) obj#))
+
+     (defn ~(symbol (str "validate-" ?struct-name "!"))
+       ~(format "Takes an object and checks if it is a %s. If so, returns true, otherwise throws an ex-info with the explanation on why it does not check." ?struct-name)
+       [obj#]
+       (or (s/valid? ~(keyword (str *ns*) (str ?struct-name)) obj#)
+           (throw (ex-info (format "Object %s is not a %s." obj# ~(str ?struct-name))
+                           {:explanation (s/explain-data ~(keyword (str *ns*) (str ?struct-name)) obj#)}))))))
