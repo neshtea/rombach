@@ -42,7 +42,6 @@
     (throw (ex-info "not a monad" {:arguments [monad]})))
   ((monad-fail monad) x))
 
-
 ;;;; Monad do
 (defmacro monadic-1
   [?implementation ?meta & ?stmts]
@@ -55,7 +54,7 @@
          (letfn [(recurse [?pairs]
                    (let [[?pat ?rhs] (first ?pairs)
                          ?rest (rest ?pairs)]
-                     `(with-meta (rom/_bind ~?implementation
+                     `(with-meta (_bind ~?implementation
                                         ~?rhs
                                         (fn [~?pat]
                                           ~(if (empty? ?rest)
@@ -82,7 +81,8 @@
 
 (defmacro monadic
   "CREDIT to active.clojure.monad.
-  This implementation is a staight rip-off from: https://github.com/active-group/active-clojure/blob/master/src/active/clojure/monad.cljc"
+  This implementation is almost a staight rip-off from:
+  https://github.com/active-group/active-clojure/blob/master/src/active/clojure/monad.cljc"
   [?monad & ?stmts]
   `(monadic-1 ~?monad ~(meta &form) ~@?stmts))
 
