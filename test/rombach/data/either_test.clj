@@ -1,9 +1,6 @@
 (ns rombach.data.either-test
-  (:require [clojure.spec.test.alpha :as stest]
-            [clojure.test :refer :all]
+  (:require [clojure.test :refer :all]
             [rombach.data.either :as either]))
-
-(stest/instrument)
 
 (deftest either-test
   (let [fn-call (fn [e-a-b]

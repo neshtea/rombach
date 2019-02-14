@@ -1,11 +1,12 @@
 (ns rombach.control.applicative
   (:require [rombach.data.functor :as functor]
-            [rombach.structure.product :refer [defproduct]]))
+            [active.clojure.record :refer [define-record-type]]))
 
-(defproduct applicative applicative applicative?
-  [[functor ::functor/functor]
-   [pure fn?]
-   [apply fn?]])
+(define-record-type Applicative
+  (applicative functor pure apply) applicative?
+  [functor applicative-functor
+   pure applicative-pure
+   apply applicative-apply])
 
 (defn _pure
    "Takes an applicative and some value x and 'lifts' it into the applicative."

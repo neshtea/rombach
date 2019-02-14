@@ -3,39 +3,23 @@
             [clojure.spec.alpha :as s]
             [rombach.control.applicative :as applicative]
             [rombach.control.monad :as monad]
-            [rombach.control.prism :as prism]
             [rombach.data.either :as either]
             [rombach.data.functor :as functor]
             [rombach.data.monoid :as monoid]
-            [rombach.structure.product :refer [defproduct]]
-            [rombach.structure.sum :refer [defsum]]))
+            [active.clojure.record :refer [define-record-type]]))
 
 ;;;; Maybe
-(defproduct just just just?
-  [[a any?]])
+(define-record-type Just
+  (just a) just?
+  [a just-a])
 
-(defproduct nothing make-nothing nothing?
-  [])
+(define-record-type Nothing (make-nothing) nothing? [])
 
 (def nothing (make-nothing))
 
-(defsum maybe maybe? [[just? ::just]
-                      [nothing? ::nothing]])
-
-;;;; Prism over maybe.
-(def the-just
-  (prism/prism (fn [m]
-                 (cond
-                   (just? m)    (either/right (just-a m))
-                   (nothing? m) (either/left nothing)))
-               just))
-
-(def the-nothing
-  (prism/prism (fn [m]
-                 (cond
-                   (just? m)    (either/left m)
-                   (nothing? m) (either/right nothing)))
-               (constantly nothing)))
+(defn maybe?
+  [thing]
+  (or (just? thing) (nothing? thing)))
 
 ;;;; Utility functions.
 

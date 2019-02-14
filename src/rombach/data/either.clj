@@ -2,17 +2,19 @@
   (:require [active.clojure.condition :as c]
             [rombach.control.applicative :as applicative]
             [rombach.data.functor :as functor]
-            [rombach.structure.product :refer [defproduct]]
-            [rombach.structure.sum :refer [defsum]]))
+            [active.clojure.record :refer [define-record-type]]))
 
-(defproduct left left left?
-  [[a any?]])
+(define-record-type Left
+  (left a) left?
+  [a left-a])
 
-(defproduct right right right?
-  [[b any?]])
+(define-record-type Right
+  (right b) right?
+  [b right-b])
 
-(defsum either either? [[left? ::left]
-                        [right? ::right]])
+(defn either?
+  [thing]
+  (or (left? thing) (right? thing)))
 
 ;;;; Utility functions.
 (defn- fail-either

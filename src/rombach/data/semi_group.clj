@@ -1,8 +1,9 @@
 (ns rombach.data.semi-group
-  (:require [rombach.structure.product :refer [defproduct]]))
+  (:require [active.clojure.record :refer [define-record-type]]))
 
-(defproduct semi-group semi-group semi-group?
-  [[cat fn?]])
+(define-record-type SemiGroup
+  (semi-group cat) semi-group?
+  [cat semi-group-cat])
 
 (defn _cat
   [semi-group a b]

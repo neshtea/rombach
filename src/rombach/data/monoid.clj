@@ -1,10 +1,11 @@
 (ns rombach.data.monoid
-  (:require [rombach.structure.product :refer [defproduct]]
+  (:require [active.clojure.record :refer [define-record-type]]
             [rombach.data.semi-group :as semi-group]))
 
-(defproduct monoid monoid monoid?
-  [[semi-group ::semi-group/semi-group]
-   [mempty any?]])
+(define-record-type Monoid
+  (monoid semi-group mempty) monoid?
+  [semi-group monoid-semi-group
+   mempty monoid-mempty])
 
 (defn _mempty
   "Takes a monoid and returns the zero element of that monoid."

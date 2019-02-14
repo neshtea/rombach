@@ -2,51 +2,53 @@
   (:require [clojure.spec.alpha :as s]
             [rombach.control.applicative :as applicative]
             [rombach.data.functor :as functor]
-            [rombach.structure.product :refer [defproduct]]))
+            [active.clojure.record :refer [define-record-type]]
+            [active.clojure.condition :as c]))
 
-(defproduct monad make-monad monad?
-  [[applicative ::applicative/applicative]
-   [return fn?]
-   [bind fn?]
-   [seq (s/or :none nil? :function fn?)]
-   [fail (s/or :none nil? :function fn?)]])
+(define-record-type Monad
+  (make-monad applicative return bind seq fail) monad?
+  [applicative monad-applicative
+   return monad-return
+   bind monad-bind
+   seq monad-seq
+   fail monad-fail])
 
 (defn monad
   ([applicative return bind]
-   (monad applicative return bind {:seq  #(throw (Exception. "Not yet implemented."))
-                                   :fail #(throw (Exception. "Not yet implemented."))}))
+   (monad applicative return bind {:seq  #(c/assertion-violation `monad "No implementation for monad-seq")
+                                   :fail #(c/assertion-violation `monad "No implementation for monad-fail")}))
   ([applicative return bind more]
    (make-monad applicative return bind (:seq more) (:fail more))))
 
 (defn _return
    [monad x]
    (when-not (monad? monad)
-     (throw (ex-info "not a monad" {:arguments [monad]})))
+     (c/assertion-violation `_return "not a monad" monad))
    ((monad-return monad) x))
 
 (defn _bind
   [monad a b]
   (when-not (monad? monad)
-    (throw (ex-info "not a monad" {:arguments [monad]})))
+    (c/assertion-violation `_bind "not a monad" monad))
   ((monad-bind monad) a b))
 
 (defn _seq
   [monad a b]
   (when-not (monad? monad)
-    (throw (ex-info "not a monad" {:arguments [monad]})))
+    (c/assertion-violation `_seq "not a monad" monad))
   ((monad-seq monad) a b))
 
 (defn _fail
   [monad x]
   (when-not (monad? monad)
-    (throw (ex-info "not a monad" {:arguments [monad]})))
+    (c/assertion-violation `_fail "not a monad" monad))
   ((monad-fail monad) x))
 
 ;;;; Monad do
 (defmacro monadic-1
   [?implementation ?meta & ?stmts]
   (if (empty? ?stmts)
-    (throw (ex-info (str "there must be at least one statement in " *ns* " " ?meta)))
+    (c/assertion-violation `monadic-1 "there must be at least one statement in " *ns* " " ?meta)
     (let [?stmt (first ?stmts)]
       (cond
        (vector? ?stmt)
@@ -66,8 +68,7 @@
        (and (list? ?stmt)
             (= 'let (first ?stmt)))
        (do (when-not (= 2 (count ?stmt))
-             (throw (ex-info (str "let statement must have exactly one subform in "
-                                  *ns* " " ?meta))))
+             (c/assertion-violation `monadic-1 "let statement must have exactly one subform in " *ns* " " ?meta))
            `(let ~(second ?stmt)
               (monadic-1 ~?implementation ~?meta ~@(rest ?stmts))))
 
@@ -90,8 +91,8 @@
 (def _list
   (monad
    applicative/_list
-   list
-   (fn [xs f]
+   list  ; return
+   (fn [xs f]  ; bind
      (apply concat
             (functor/_fmap
              (applicative/applicative-functor applicative/_list) f xs)))
